@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Patrol System</title>
+
+    <style>
+
+        body{
+        font-family: Arial;
+        text-align:center;
+        background:#111;
+        color:white;
+        padding:20px;
+        }
+
+        button{
+        width:260px;
+        padding:18px;
+        margin:10px;
+        font-size:20px;
+        border:none;
+        border-radius:10px;
+        }
+
+        .round{
+        background:#2ecc71;
+        }
+
+        .incident{
+        background:#e67e22;
+        }
+
+        .end{
+        background:#e74c3c;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h2>Security Guard Patrol Systyem</h2>
+
+<h3>Rondering</h3>
+
+<button class="round" onclick="round('ANA 8')">ANA 8</button>
+<button class="round" onclick="round('ANA 23')">ANA 23</button>
+<button class="round" onclick="round('Neo')">Neo</button>
+
+<h3>Incident</h3>
+
+<button class="incident" onclick="incident()">Rapportera incident</button>
+
+<h3>Avsluta Pass</h3>
+
+<button class="end" onclick="endShift()">Skicka rapport</button>
+
+<script>
+
+    function round(location){
+
+    fetch("/patrol/round?location=" + location,{
+    method:"POST"
+    })
+
+    alert("Rond registrerad: " + location)
+
+    }
+
+    function incident(){
+
+    let description = prompt("Beskriv incident")
+
+    if(!description) return
+
+    fetch("/patrol/incident?description=" + description,{
+    method:"POST"
+    })
+
+    alert("Incident registrerad")
+
+    }
+
+    function endShift(){
+
+    fetch("/patrol/end-shift",{
+    method:"POST"
+    })
+
+    alert("Rapport genererad")
+
+    }
+
+</script>
+
+</body>
+
+</html>
