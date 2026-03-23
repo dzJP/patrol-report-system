@@ -21,6 +21,7 @@ public class IncidentService {
         Incident incident = new Incident();
         incident.setDescription(description);
         incident.setTime(LocalDateTime.now());
+        incidentRepository.save(incident);
     }
 
     public List<Incident> getAllIncidents() {

@@ -2,18 +2,22 @@ spring:
   application:
     name: patrol-report-system
 
-    mail:
-      host: test.gmail.com
-      port: 587
-      username: test@email.com
-      password: testpassword
-      properties:
-        mail:
-          smtp:
-            auth: true
-            starttls:
-              enable: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: patrolreportsystem@somemail.com
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+report:
+  email:
+    recipient: supervisor@outlook.com
+
 server:
   address: 0.0.0.0
   port: 8080
-
