@@ -1,45 +1,57 @@
 package com.jakob.patrol.controller;
 
-import com.jakob.patrol.service.EmailService;
+import jakarta.validation.Valid;
+
 import com.jakob.patrol.service.IncidentService;
 import com.jakob.patrol.service.PatrolService;
-import com.jakob.patrol.service.ReportService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import com.jakob.patrol.dto.*;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/patrol")
+@RequestMapping("/api/patrols")
 public class PatrolController {
 
     private final PatrolService patrolService;
     private final IncidentService incidentService;
-    private final ReportService reportService;
-    private final EmailService emailService;
 
-
-    public PatrolController(PatrolService patrolService, IncidentService incidentService, ReportService reportService, EmailService emailService) {
+    public PatrolController(PatrolService patrolService,
+                            IncidentService incidentService) {
         this.patrolService = patrolService;
         this.incidentService = incidentService;
-        this.reportService = reportService;
-        this.emailService = emailService;
     }
 
-    @PostMapping("/end-shift")
-    public void endShift() {
-        String report = reportService.generateReport();
-        emailService.sendReport(report);
+    @PostMapping
+    public Long startPatrol(Authentication authentication) {
+        String username = authentication.getName();
+        return patrolService.startPatrol(username);
     }
 
-    @PostMapping("/round")
-    public void addRound(@RequestParam String location) {
-        patrolService.recordRound(location);
+    @PostMapping("/{patrolId}/rounds")
+    public void addRound(@PathVariable Long patrolId,
+                         @Valid @RequestBody RoundRequest request) {
+        patrolService.recordRound(patrolId, request.getLocation());
     }
 
-    @PostMapping("incident")
-    public void addIncident(@RequestParam String description) {
-        incidentService.recordIncident(description);
+    @PostMapping("/{patrolId}/incidents")
+    public void addIncident(@PathVariable Long patrolId,
+                            @Valid @RequestBody IncidentRequest request) {
+        incidentService.recordIncident(patrolId, request.getDescription());
     }
 
+    @PostMapping("/{patrolId}/end")
+    public void endPatrol(@PathVariable Long patrolId) {
+        patrolService.endPatrol(patrolId);
+    }
+
+    @GetMapping("/{patrolId}")
+    public PatrolResponse getPatrol(@PathVariable Long patrolId) {
+        return patrolService.getPatrol(patrolId);
+    }
+
+    @GetMapping("/{patrolId}/report")
+    public ReportResponse getReport(@PathVariable Long patrolId) {
+        return patrolService.getReport(patrolId);
+    }
 }

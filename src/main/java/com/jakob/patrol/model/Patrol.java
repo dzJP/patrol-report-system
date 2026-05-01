@@ -2,25 +2,28 @@ package com.jakob.patrol.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
 @Entity
 @Getter
 @Setter
-public class PatrolRound {
+public class Patrol {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String location;
-    private LocalDateTime time;
+    private String username;
 
-    @ManyToOne
-    @JoinColumn(name = "patrol_id")
-    private Patrol patrol;
+    private Long userId;
+
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    @Enumerated(EnumType.STRING)
+    private PatrolStatus status;
+
 }
