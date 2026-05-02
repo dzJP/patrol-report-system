@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrol</title>
+</head>
+<body>
+<button onclick="start()">Start Patrol</button>
+<button onclick="addRound()">Add Round</button>
+
+<input id="desc" placeholder="Incident description"/>
+<button onclick="addIncident()">Add Incident</button>
+
+<button onclick="end()">End Patrol</button>
+
+<script>
+    const base = "http://localhost:8080/api/patrols";
+    let patrolId = null;
+
+    async function start() {
+      const res = await fetch(base, { method: "POST" });
+      patrolId = await res.json();
+      alert("Started: " + patrolId);
+    }
+
+    async function addRound() {
+      if (!patrolId) return alert("Start patrol first");
+      await fetch(`${base}/${patrolId}/rounds`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ location: "Mobile tap" })
+      });
+      alert("Round added");
+    }
+
+    async function addIncident() {
+      if (!patrolId) return alert("Start patrol first");
+      const desc = document.getElementById("desc").value;
+      await fetch(`${base}/${patrolId}/incidents`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ description: desc })
+      });
+      alert("Incident added");
+    }
+
+    async function end() {
+      if (!patrolId) return alert("Start patrol first");
+      await fetch(`${base}/${patrolId}/end`, { method: "POST" });
+      alert("Ended");
+    }
+</script>
+</body>
+</html>

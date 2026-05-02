@@ -4,7 +4,7 @@
 REST API for managing security patrols, logging rounds and incidents, and generating end-of-shift reports.
 
 ## Features
-- Patrol lifecycle (start → active → completed)
+- Patrol lifecycle (start > active > completed)
 - Rounds and incidents linked to patrol
 - Report generation per patrol
 - Validation and domain rule enforcement (cannot add after end)
@@ -17,7 +17,7 @@ REST API for managing security patrols, logging rounds and incidents, and genera
 - Docker (optional)
 
 ## API Flow
-1. Start patrol → returns ID
+1. Start patrol > returns ID
 2. Add rounds
 3. Add incidents
 4. End patrol
