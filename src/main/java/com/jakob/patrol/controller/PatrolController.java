@@ -24,8 +24,7 @@ public class PatrolController {
 
     @PostMapping
     public Long startPatrol(Authentication authentication) {
-        String username = authentication.getName();
-        return patrolService.startPatrol(username);
+        return patrolService.startPatrol("demo-user");
     }
 
     @PostMapping("/{patrolId}/rounds")
