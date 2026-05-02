@@ -1,103 +1,169 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patrol System</title>
 
     <style>
-
-        body{
-        font-family: Arial;
-        text-align:center;
-        background:#111;
-        color:white;
-        padding:20px;
+        body {
+          background: #0f172a;
+          color: white;
+          font-family: Arial, sans-serif;
+          text-align: center;
+          padding: 20px;
         }
 
-        button{
-        width:260px;
-        padding:18px;
-        margin:10px;
-        font-size:20px;
-        border:none;
-        border-radius:10px;
+        h1 {
+          margin-bottom: 30px;
         }
 
-        .round{
-        background:#2ecc71;
+        h2 {
+          margin-top: 30px;
         }
 
-        .incident{
-        background:#e67e22;
+        button {
+          width: 80%;
+          max-width: 300px;
+          padding: 15px;
+          margin: 10px;
+          border: none;
+          border-radius: 10px;
+          font-size: 18px;
+          cursor: pointer;
         }
 
-        .end{
-        background:#e74c3c;
+        .round-btn {
+          background: #22c55e;
         }
 
+        .incident-btn {
+          background: #f97316;
+        }
+
+        .end-btn {
+          background: #ef4444;
+        }
+
+        input {
+          width: 80%;
+          max-width: 300px;
+          padding: 12px;
+          border-radius: 8px;
+          border: none;
+          margin-top: 10px;
+        }
+
+        #status {
+          margin-top: 20px;
+          font-size: 16px;
+          color: #38bdf8;
+        }
     </style>
-
 </head>
 
 <body>
 
-<h2>Security Guard Patrol Systyem</h2>
+<h1>Security Guard Patrol</h1>
 
-<h3>Rondering</h3>
+<button onclick="startPatrol()">Start Patrol</button>
 
-<button class="round" onclick="round('ANA 8')">ANA 8</button>
-<button class="round" onclick="round('ANA 23')">ANA 23</button>
-<button class="round" onclick="round('Neo')">Neo</button>
+<h2>Rounds</h2>
+<button class="round-btn" onclick="addRound('ANA 8')">ANA 8</button>
+<button class="round-btn" onclick="addRound('ANA 23')">ANA 23</button>
+<button class="round-btn" onclick="addRound('Neo')">Neo</button>
 
-<h3>Incident</h3>
+<h2>Incident</h2>
+<input id="desc" placeholder="Describe incident..." />
+<br>
+<button class="incident-btn" onclick="addIncident()">Report Incident</button>
 
-<button class="incident" onclick="incident()">Rapportera incident</button>
+<h2>Finish</h2>
+<button class="end-btn" onclick="endPatrol()">End Patrol</button>
 
-<h3>Avsluta Pass</h3>
-
-<button class="end" onclick="endShift()">Skicka rapport</button>
+<p id="status"></p>
 
 <script>
+    const baseUrl = "http://YOUR-IP:8080/api/patrols"; // <-- CHANGE THIS
+    let patrolId = null;
 
-    function round(location){
-
-    fetch("/patrol/round?location=" + location,{
-    method:"POST"
-    })
-
-    alert("Rond registrerad: " + location)
-
+    function setStatus(msg) {
+      document.getElementById("status").innerText = msg;
     }
 
-    function incident(){
-
-    let description = prompt("Beskriv incident")
-
-    if(!description) return
-
-    fetch("/patrol/incident?description=" + description,{
-    method:"POST"
-    })
-
-    alert("Incident registrerad")
-
+    async function startPatrol() {
+      try {
+        const res = await fetch(baseUrl, { method: "POST" });
+        patrolId = await res.json();
+        setStatus("Patrol started (ID: " + patrolId + ")");
+      } catch (e) {
+        setStatus("Error starting patrol");
+      }
     }
 
-    function endShift(){
+    async function addRound(location) {
+      if (!patrolId) {
+        setStatus("Start patrol first");
+        return;
+      }
 
-    fetch("/patrol/end-shift",{
-    method:"POST"
-    })
+      try {
+        await fetch(`${baseUrl}/${patrolId}/rounds`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ location })
+        });
 
-    alert("Rapport genererad")
-
+        setStatus("Round added: " + location);
+      } catch (e) {
+        setStatus("Error adding round");
+      }
     }
 
+    async function addIncident() {
+      if (!patrolId) {
+        setStatus("Start patrol first");
+        return;
+      }
+
+      const description = document.getElementById("desc").value;
+
+      if (!description) {
+        setStatus("Enter a description");
+        return;
+      }
+
+      try {
+        await fetch(`${baseUrl}/${patrolId}/incidents`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description })
+        });
+
+        setStatus("Incident reported");
+        document.getElementById("desc").value = "";
+      } catch (e) {
+        setStatus("Error reporting incident");
+      }
+    }
+
+    async function endPatrol() {
+      if (!patrolId) {
+        setStatus("Start patrol first");
+        return;
+      }
+
+      try {
+        await fetch(`${baseUrl}/${patrolId}/end`, {
+          method: "POST"
+        });
+
+        setStatus("Patrol ended");
+        patrolId = null;
+      } catch (e) {
+        setStatus("Error ending patrol");
+      }
+    }
 </script>
 
 </body>
-
 </html>
