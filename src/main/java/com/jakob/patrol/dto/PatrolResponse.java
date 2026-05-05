@@ -1,5 +1,7 @@
 package com.jakob.patrol.dto;
 
+import com.jakob.patrol.model.Incident;
+import com.jakob.patrol.model.PatrolRound;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +18,7 @@ public class PatrolResponse {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    private List<RoundDTO> rounds;
-    private List<IncidentDTO> incidents;
+    private List<PatrolRound> rounds;
+    private List<Incident> incidents;
 
 }

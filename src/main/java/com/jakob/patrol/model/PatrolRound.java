@@ -1,5 +1,6 @@
 package com.jakob.patrol.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,6 @@ public class PatrolRound {
 
     @ManyToOne
     @JoinColumn(name = "patrol_id")
+    @JsonBackReference
     private Patrol patrol;
 }
