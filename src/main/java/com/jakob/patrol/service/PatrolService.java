@@ -7,6 +7,7 @@ import com.jakob.patrol.repository.IncidentRepository;
 import com.jakob.patrol.repository.PatrolRepository;
 import com.jakob.patrol.repository.PatrolRoundRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,8 +53,18 @@ public class PatrolService {
         roundRepository.save(round);
     }
 
+    @Transactional
     public void endPatrol(Long patrolId) {
-        Patrol patrol = getActivePatrol(patrolId);
+        Patrol patrol = patrolRepository.findById(patrolId)
+                .orElseThrow(() -> new RuntimeException("Patrol not found"));
+
+        if (patrol.getStatus() == PatrolStatus.COMPLETED) {
+            throw new IllegalStateException("Patrol already completed");
+        }
+
+        if (patrol.getStatus() != PatrolStatus.ACTIVE) {
+            throw new IllegalStateException("Patrol is not active");
+        }
 
         patrol.setStatus(PatrolStatus.COMPLETED);
         patrol.setEndTime(LocalDateTime.now());
@@ -61,6 +72,11 @@ public class PatrolService {
         patrolRepository.save(patrol);
 
         String report = reportService.generateReportForPatrol(patrolId);
+
+        if (report == null || report.isBlank()) {
+            throw new IllegalStateException("Generated report is empty");
+        }
+
         emailService.sendReport(report);
     }
 
@@ -88,7 +104,6 @@ public class PatrolService {
         response.setStatus(patrol.getStatus().name());
         response.setStartTime(patrol.getStartTime());
         response.setEndTime(patrol.getEndTime());
-
         response.setRounds(rounds);
         response.setIncidents(incidents);
 
@@ -96,6 +111,10 @@ public class PatrolService {
     }
 
     public ReportResponse getReport(Long patrolId) {
+
+        // Ensure patrol exists
+        patrolRepository.findById(patrolId)
+                .orElseThrow(() -> new RuntimeException("Patrol not found"));
 
         List<PatrolRound> rounds = roundRepository.findByPatrolId(patrolId);
         List<Incident> incidents = incidentRepository.findByPatrolId(patrolId);

@@ -4,6 +4,7 @@ import com.jakob.patrol.model.*;
 import com.jakob.patrol.repository.IncidentRepository;
 import com.jakob.patrol.repository.PatrolRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -11,25 +12,25 @@ import java.time.LocalDateTime;
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
-    private final PatrolRepository patrolRepository;
+    private final PatrolService patrolService;
 
     public IncidentService(IncidentRepository incidentRepository,
-                           PatrolRepository patrolRepository) {
+                           PatrolService patrolService) {
         this.incidentRepository = incidentRepository;
-        this.patrolRepository = patrolRepository;
+        this.patrolService = patrolService;
     }
 
+    @Transactional
     public void recordIncident(Long patrolId, String description) {
 
-        Patrol patrol = patrolRepository.findById(patrolId)
-                .orElseThrow(() -> new RuntimeException("Patrol not found"));
-
-        if (patrol.getStatus() != PatrolStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot add incident to inactive patrol");
+        if (description == null || description.isBlank()) {
+            throw new IllegalArgumentException("Incident description cannot be empty");
         }
 
+        Patrol patrol = patrolService.getActivePatrol(patrolId);
+
         Incident incident = new Incident();
-        incident.setDescription(description);
+        incident.setDescription(description.trim());
         incident.setTime(LocalDateTime.now());
         incident.setPatrol(patrol);
 
