@@ -5,29 +5,26 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class EmailService {
 
-    @Value("${report.email.recipient}")
-    private String reportRecipient;
     private final JavaMailSender mailSender;
 
+    @Value("${report.email.recipient}")
+    private String recipient;
 
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
-    public void sendReport(String report) {
+    public void sendReport(String reportContent) {
 
-        System.out.println("=== PATROL REPORT ===");
-        System.out.println(report);
-        System.out.println("=====================");
-        /*SimpleMailMessage message = new SimpleMailMessage();
-
-        message.setTo(reportRecipient);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(recipient);
         message.setSubject("Patrol Report");
-        message.setText(report);
-        mailSender.send(message);*/
+        message.setText(reportContent);
+
+        mailSender.send(message);
+        System.out.println("Sending patrol report email...");
     }
 }

@@ -1,5 +1,6 @@
 package com.jakob.patrol.controller;
 
+import com.jakob.patrol.service.EmailService;
 import jakarta.validation.Valid;
 
 import com.jakob.patrol.service.IncidentService;
@@ -15,11 +16,13 @@ public class PatrolController {
 
     private final PatrolService patrolService;
     private final IncidentService incidentService;
+    private final EmailService emailService;
 
     public PatrolController(PatrolService patrolService,
-                            IncidentService incidentService) {
+                            IncidentService incidentService, EmailService emailService) {
         this.patrolService = patrolService;
         this.incidentService = incidentService;
+        this.emailService = emailService;
     }
 
     @PostMapping

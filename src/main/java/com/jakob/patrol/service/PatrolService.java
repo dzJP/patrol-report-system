@@ -79,12 +79,18 @@ public class PatrolService {
         Patrol patrol = patrolRepository.findById(patrolId)
                 .orElseThrow(() -> new RuntimeException("Patrol not found"));
 
+        List<PatrolRound> rounds = roundRepository.findByPatrolId(patrolId);
+        List<Incident> incidents = incidentRepository.findByPatrolId(patrolId);
+
         PatrolResponse response = new PatrolResponse();
         response.setId(patrol.getId());
         response.setUsername(patrol.getUsername());
         response.setStatus(patrol.getStatus().name());
         response.setStartTime(patrol.getStartTime());
         response.setEndTime(patrol.getEndTime());
+
+        response.setRounds(rounds);
+        response.setIncidents(incidents);
 
         return response;
     }
@@ -100,7 +106,7 @@ public class PatrolService {
         response.setTotalIncidents(incidents.size());
 
         List<String> summaries = incidents.stream()
-                .map(i -> i.getDescription())
+                .map(Incident::getDescription)
                 .toList();
 
         response.setIncidentSummaries(summaries);
